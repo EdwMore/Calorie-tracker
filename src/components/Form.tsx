@@ -1,14 +1,23 @@
 import { useState } from "react";
-import type { ChangeEvent, SubmitEvent } from "react";
+import type { ChangeEvent, Dispatch, SubmitEvent } from "react";
+import { v4 as uuidv4 } from "uuid";
 import type { Activity } from "../types";
 import { categories } from "../data/categories";
+import type { ActivityActions } from "../reducers/activty-reducer";
 
-export default function Form() {
-  const [activity, setActivity] = useState<Activity>({
-    category: 1,
-    name: "",
-    calories: 0,
-  });
+type FormProps = {
+  dispatch: Dispatch<ActivityActions>;
+};
+
+const initialState = {
+  id: uuidv4(),
+  category: 1,
+  name: "",
+  calories: 0,
+};
+
+export default function Form({ dispatch }: FormProps) {
+  const [activity, setActivity] = useState<Activity>(initialState);
 
   const handleChange = (
     e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement>,
@@ -22,22 +31,25 @@ export default function Form() {
   };
 
   const isValidActivity = () => {
-    const { name, calories } = activity
-    return name.trim() !== '' && calories > 0
-
-  }
+    const { name, calories } = activity;
+    return name.trim() !== "" && calories > 0;
+  };
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    console.log("Submit...");
-    
-  }
+    dispatch({ type: "save-activity", payload: { newActivity: activity } });
+
+    setActivity({
+      ...initialState,
+      id: uuidv4(),
+    });
+  };
 
   return (
-    <form 
-        className="space-y-5 bg-white shadow p-10 rounded-lg"
-        onSubmit={handleSubmit}
+    <form
+      className="space-y-5 bg-white shadow p-10 rounded-lg"
+      onSubmit={handleSubmit}
     >
       <div className="grid grid-cols-1 gap-3">
         <label htmlFor="category" className="font-bold">
@@ -64,7 +76,11 @@ export default function Form() {
             type="text"
             id="name"
             className="border border-slate-300 p-2 rounded-lg"
-            placeholder={activity.category === 1 ? "Ej. Comida, Jugo de Piña, Ensalada" : "Ej. Ejercicio, Pesas, Bicicleta"}
+            placeholder={
+              activity.category === 1
+                ? "Ej. Comida, Jugo de Piña, Ensalada"
+                : "Ej. Ejercicio, Pesas, Bicicleta"
+            }
             value={activity.name}
             onChange={handleChange}
           />
@@ -87,7 +103,9 @@ export default function Form() {
         <input
           type="submit"
           className="bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer disabled:opacity-20"
-          value={activity.category === 1 ? "Guardar Comida" : "Guardar Ejercicio"}
+          value={
+            activity.category === 1 ? "Guardar Comida" : "Guardar Ejercicio"
+          }
           disabled={!isValidActivity()}
         />
       </div>
