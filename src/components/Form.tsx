@@ -29,6 +29,7 @@ export default function Form({ dispatch, state }: FormProps) {
         (stateActivity) => stateActivity.id === state.activeId,
       )[0];
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActivity(selectedActivity);
     }
   }, [state.activeId, state.activities]);
@@ -59,6 +60,20 @@ export default function Form({ dispatch, state }: FormProps) {
       id: uuidv4(),
     });
   };
+
+  // const changeText =
+  //   activity.category === 1
+  //     ? state.activeId
+  //       ? "Editar Comida"
+  //       : "Guardar Comida"
+  //     : state.activeId
+  //       ? "Editar Ejercicio"
+  //       : "Guardar Ejercicio";
+
+  const action = state.activeId ? "Editar" : "Guardar";
+  const type = activity.category === 1 ? "Comida" : "Ejercicio";
+
+  const changeText = `${action} ${type}`;
 
   return (
     <form
@@ -117,9 +132,7 @@ export default function Form({ dispatch, state }: FormProps) {
         <input
           type="submit"
           className="bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer disabled:opacity-20"
-          value={
-            activity.category === 1 ? "Guardar Comida" : "Guardar Ejercicio"
-          }
+          value={changeText}
           disabled={!isValidActivity()}
         />
       </div>
